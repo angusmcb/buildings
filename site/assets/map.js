@@ -1,6 +1,7 @@
 export function mountMap(element,props,auth,submit,accountError) {
   const root = element.querySelector('.tracker');
   const container = root.querySelector('.tracker-map');
+  const startup = root.querySelector('.map-startup');
   const day = root.querySelector('.target-day');
   const comparison = root.querySelector('.comparison-options');
   const comparisonYears = root.querySelector('.comparison-years');
@@ -135,15 +136,15 @@ export function mountMap(element,props,auth,submit,accountError) {
   function feature(area) {
     return area ? {type:'FeatureCollection',features:[{type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[area.ring]}}]} : empty;
   }
+  if (!window.settlementPMTilesProtocol) {
+    window.settlementPMTilesProtocol=new pmtiles.Protocol();
+    maplibregl.addProtocol('pmtiles',window.settlementPMTilesProtocol.tile);
+  }
   const map = new maplibregl.Map({
     container, style:props.map_styles[theme], bounds:coverage.bounds,
     fitBoundsOptions:{padding:30}, renderWorldCopies:false, minZoom:1, maxPitch:0,
     dragRotate:false, touchPitch:false, attributionControl:false,
   });
-  if (!window.settlementPMTilesProtocol) {
-    window.settlementPMTilesProtocol=new pmtiles.Protocol();
-    maplibregl.addProtocol('pmtiles',window.settlementPMTilesProtocol.tile);
-  }
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),'bottom-right');
   map.addControl(new maplibregl.ScaleControl({maxWidth:100,unit:'metric'}),'bottom-left');
   root.querySelector('.tracker-scale').append(container.querySelector('.maplibregl-ctrl-scale'));
@@ -370,7 +371,9 @@ export function mountMap(element,props,auth,submit,accountError) {
   }
   function setAppMode(value) {
     if(busy)return;
+    if (value!==appMode) selectionAttempt++;
     appMode=value;
+    if (appMode==='live') loadProjectionLibrary().catch(()=>{});
     for(const button of root.querySelectorAll('[data-app-mode]')) {
       const active=button.dataset.appMode===value;
       button.setAttribute('aria-selected',String(active));
@@ -392,14 +395,14 @@ export function mountMap(element,props,auth,submit,accountError) {
     renderImages(current,true); updateSelection();raiseMapLabels();
   }
   map.on('style.load',()=>{installLayers();updateFlooding();});
-  // The canvas can paint before the initial vector tiles supply the land.
-  // Keep the theme background visible until MapLibre renders that basemap.
-  function revealBasemap() {
-    if (!basemapReady || !map.isSourceLoaded('openmaptiles')) return;
-    delete container.dataset.loading;
-    map.off('render',revealBasemap);
+  function finishBasemapStartup() {
+    startup.hidden=true;
+    map.off('render',updateBasemapStartup);
   }
-  map.on('render',revealBasemap);
+  function updateBasemapStartup() {
+    if (basemapReady && map.isSourceLoaded('openmaptiles')) finishBasemapStartup();
+  }
+  map.on('render',updateBasemapStartup);
   function updateZoomIndicator() {
     const zoom=map.getZoom().toFixed(1),indicator=legend.querySelector('.zoom-level');
     indicator.textContent='z '+zoom;
@@ -409,6 +412,7 @@ export function mountMap(element,props,auth,submit,accountError) {
   map.on('zoom',()=>{updateZoomIndicator();resizeResultHeader();updateChangeOverview();});
   map.on('resize',resizeResultHeader);
   map.on('error',event=>{
+    if (event.sourceId==='openmaptiles' && !startup.hidden) finishBasemapStartup();
     if(event.sourceId==='flooding') {
       if(floodingToggle.checked) {
         floodingStatus.textContent='Flooding could not load for this year. Try another year.';
@@ -437,16 +441,19 @@ export function mountMap(element,props,auth,submit,accountError) {
       return {...response,data:await createImageBitmap(response.data,{premultiplyAlpha:'premultiply'})};
     } finally {response.data.close();}
   }
+  function loadScript(src) {
+    return new Promise((resolve,reject)=>{
+      const script=document.createElement('script');
+      script.src=src;
+      script.onload=resolve;
+      script.onerror=()=>{script.remove();reject(new Error('Could not load '+src));};
+      document.head.append(script);
+    });
+  }
   let floodingLibrary;
   function loadFloodingLibrary() {
-    if (typeof MaplibreCOGProtocol!=='undefined') return Promise.resolve();
-    floodingLibrary ??= new Promise((resolve,reject)=>{
-      const script=document.createElement('script');
-      script.src='https://unpkg.com/@geomatico/maplibre-cog-protocol@0.10.0/dist/index.js';
-      script.onload=resolve;
-      script.onerror=()=>{script.remove();reject(new Error('Could not load the flooding library.'));};
-      document.head.append(script);
-    }).catch(error=>{floodingLibrary=null;throw error;});
+    floodingLibrary ??= loadScript('https://unpkg.com/@geomatico/maplibre-cog-protocol@0.10.0/dist/index.js')
+      .catch(error=>{floodingLibrary=null;throw error;});
     return floodingLibrary;
   }
   async function updateFlooding() {
@@ -504,12 +511,28 @@ export function mountMap(element,props,auth,submit,accountError) {
       map.fitBounds(bounds,{padding,maxZoom,duration});
     }
   }
-  function selectLocation(point,shortcut=false) {
-    if (busy||appMode!=='live') return;
-    if (!insideCoverage(point)) { announce('Choose a location inside the visible coverage area.');return; }
-    const area=makeSelection(point); if (!area) {announce('Choose a location inside the visible coverage area.');return;}
+  let projectionLibrary, selectionAttempt=0;
+  function loadProjectionLibrary() {
+    projectionLibrary ??= loadScript('https://unpkg.com/proj4@2.12.1/dist/proj4.js')
+      .catch(error=>{projectionLibrary=null;throw error;});
+    return projectionLibrary;
+  }
+  async function selectLocation(point,shortcut=false) {
+    if (busy||appMode!=='live') return false;
+    const attempt=++selectionAttempt;
+    if (!insideCoverage(point)) { announce('Choose a location inside the visible coverage area.');return false; }
+    if (typeof proj4==='undefined') announce('Preparing area selection…');
+    try {
+      await loadProjectionLibrary();
+    } catch {
+      if (attempt===selectionAttempt && appMode==='live') announce('Area selection could not load. Try selecting the location again.',true);
+      return false;
+    }
+    if (attempt!==selectionAttempt||busy||appMode!=='live') return false;
+    const area=makeSelection(point); if (!area) {announce('Choose a location inside the visible coverage area.');return false;}
     [longitude,latitude]=point; selectedArea=area; selected=true;
     announce(); run.disabled=false; updateSelection(); fitArea(area,shortcut);
+    return true;
   }
   const account=root.querySelector('.account-options');
   const accountAction=root.querySelector('.account-action');
@@ -567,10 +590,10 @@ export function mountMap(element,props,auth,submit,accountError) {
     updateComparison();
     const lon=Number(params.get('longitude')), lat=Number(params.get('latitude'));
     if (params.has('longitude')&&params.has('latitude')&&Number.isFinite(lon)&&Number.isFinite(lat)) {
-      map.once('load',()=>{
-        selectLocation([lon,lat],true);
+      map.once('style.load',async ()=>{
+        const restored=await selectLocation([lon,lat],true);
         // Keep the existing size label and warning in sync after restoring selection.
-        if (longitude!==null&&[2000,4000,10000].includes(size)) sizePicker.querySelector('[data-size="'+size+'"]').click();
+        if (restored&&[2000,4000,10000].includes(size)) sizePicker.querySelector('[data-size="'+size+'"]').click();
       });
     }
     for (const key of ['account_return','target_day','comparison_mode','comparison_years','comparison_day','area_metres','longitude','latitude']) params.delete(key);

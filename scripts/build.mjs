@@ -21,6 +21,7 @@ const scripts = ['account.js', 'map.js', 'space.js'];
 const css = await read('assets/map.css');
 const version = content => createHash('sha256').update(content).digest('hex').slice(0, 12);
 let entry = await read('assets/main.js');
+const preloads = [];
 
 await rm(dist, {recursive: true, force: true});
 await mkdir(new URL('assets/', dist), {recursive: true});
@@ -28,13 +29,16 @@ for (const file of scripts) {
   const source = await read('assets/' + file);
   const name = file.replace('.js', '.' + version(source) + '.js');
   await writeFile(new URL('assets/' + name, dist), source);
+  preloads.push('<link rel="modulepreload" href="./assets/' + name + '">');
   entry = entry.replace('./' + file, './' + name);
 }
 const entryName = 'main.' + version(entry) + '.js';
 await writeFile(new URL('assets/' + entryName, dist), entry);
+preloads.unshift('<link rel="modulepreload" href="./assets/' + entryName + '">');
 const cssName = 'map.' + version(css) + '.css';
 await writeFile(new URL('assets/' + cssName, dist), css);
 await writeFile(new URL('index.html', dist), template
+  .replace('<!-- map-preloads -->', preloads.join('\n  '))
   .replace('<!-- map-bootstrap -->', () => '<script type="application/json" id="map-bootstrap">' + bootstrap + '</script>')
   .replace('./assets/map.css', './assets/' + cssName)
   .replace('./assets/main.js', './assets/' + entryName));

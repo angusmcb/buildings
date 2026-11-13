@@ -1,7 +1,6 @@
 export function mountMap(element,props,auth,submit,accountError) {
   const root = element.querySelector('.tracker');
   const container = root.querySelector('.tracker-map');
-  const startup = root.querySelector('.map-startup');
   const day = root.querySelector('.target-day');
   const comparison = root.querySelector('.comparison-options');
   const comparisonYears = root.querySelector('.comparison-years');
@@ -395,14 +394,6 @@ export function mountMap(element,props,auth,submit,accountError) {
     renderImages(current,true); updateSelection();raiseMapLabels();
   }
   map.on('style.load',()=>{installLayers();updateFlooding();});
-  function finishBasemapStartup() {
-    startup.hidden=true;
-    map.off('render',updateBasemapStartup);
-  }
-  function updateBasemapStartup() {
-    if (basemapReady && map.isSourceLoaded('openmaptiles')) finishBasemapStartup();
-  }
-  map.on('render',updateBasemapStartup);
   function updateZoomIndicator() {
     const zoom=map.getZoom().toFixed(1),indicator=legend.querySelector('.zoom-level');
     indicator.textContent='z '+zoom;
@@ -412,7 +403,6 @@ export function mountMap(element,props,auth,submit,accountError) {
   map.on('zoom',()=>{updateZoomIndicator();resizeResultHeader();updateChangeOverview();});
   map.on('resize',resizeResultHeader);
   map.on('error',event=>{
-    if (event.sourceId==='openmaptiles' && !startup.hidden) finishBasemapStartup();
     if(event.sourceId==='flooding') {
       if(floodingToggle.checked) {
         floodingStatus.textContent='Flooding could not load for this year. Try another year.';

@@ -17,7 +17,6 @@ async function start() {
 }
 
 start().catch(error => {
-  document.querySelector('.map-startup').hidden = true;
   const status = document.querySelector('.selection-hint');
   status.textContent = error.message || 'The map could not load. Please reload the page.';
   status.hidden = false;

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>South Sudan Settlement Tracker</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.css">
+  <script src="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.js">
+  </script>
+  <script src="https://unpkg.com/proj4@2.12.1/dist/proj4.js">
+  </script>
+  <script src="https://unpkg.com/pmtiles@3.2.1/dist/pmtiles.js">
+  </script>
+  <script src="https://unpkg.com/@geomatico/maplibre-cog-protocol@0.10.0/dist/index.js">
+  </script>
+  <link rel="stylesheet" href="./assets/map.css">
+  <style>html,body{margin:0;overflow:hidden}</style>
+</head>
+<body>
+<div class="tracker">
+  <div class="tracker-map" aria-label="Map of South Sudan"></div>
+  <header class="tracker-header tracker-panel">
+    <h1>South Sudan Settlement Tracker</h1>
+    <div class="mode-bar">
+      <div class="map-modes" role="tablist" aria-label="Map mode">
+        <button type="button" id="archive-tab" role="tab" aria-selected="true" aria-controls="archive-controls" data-app-mode="archive">Pre-processed</button>
+        <button type="button" id="live-tab" role="tab" aria-selected="false" aria-controls="live-controls" data-app-mode="live">On the fly</button>
+      </div>
+      <button type="button" class="about-link" aria-haspopup="dialog" aria-controls="about-dialog">About</button>
+    </div>
+    <section id="archive-controls" role="tabpanel" aria-labelledby="archive-tab">
+      <div class="archive-options" role="group" aria-label="Building change period">
+        <button type="button" data-archive="change-2016-2019" aria-pressed="false" aria-label="2016 to 2019">2016–2019</button>
+        <button type="button" data-archive="change-2019-2026" aria-pressed="true" aria-label="2019 to 2026">2019–2026</button>
+      </div>
+      <div class="archive-options obt-options" id="obt-options" role="group" aria-label="Google OBT change period" hidden>
+        <button type="button" data-archive="obt-2016-2019" aria-pressed="false">OBT 2016–2019</button>
+        <button type="button" data-archive="obt-2019-2023" aria-pressed="false">OBT 2019–2023</button>
+      </div>
+    </section>
+    <section id="live-controls" role="tabpanel" aria-labelledby="live-tab" hidden>
+    <p>Select AOI on the map or jump to <a href="#lankien"
+        data-place="Lankien">Lankien</a>, <a href="#juba" data-place="Juba">Juba</a>, <a href="#bentiu"
+        data-place="Bentiu">Bentiu</a>.</p>
+    <div class="tracker-actions">
+      <input class="target-day" aria-label="Target date" type="date" min="2017-01-01"
+        required>
+      <button class="run-selection" type="button" disabled>Run</button>
+    </div>
+    <details class="comparison-options">
+      <summary>Compare with <span class="comparison-interval">1 year earlier</span></summary>
+      <div class="comparison-row"><label><input class="comparison-mode" type="radio" name="comparison-method" value="years" checked>Compare by</label><input class="comparison-years" aria-label="Years earlier" type="number" min="1" step="1" value="1" required><span>years earlier</span></div>
+      <div class="comparison-row"><label><input class="comparison-mode" type="radio" name="comparison-method" value="custom">Custom date</label><input class="comparison-day" aria-label="Comparison date" type="date" required disabled></div>
+      <p class="comparison-dates" aria-live="polite"></p>
+    </details>
+    <details class="account-options">
+      <summary><span class="account-status">Log in to HF to use your GPU allowance</span></summary>
+      <a class="account-action" href="#" target="_top" hidden>Log in with Hugging Face</a>
+      <p class="account-message">Sign in to use your Hugging Face GPU allowance.</p>
+    </details>
+    </section>
+    <div class="selection-hint" role="status" aria-live="polite" hidden></div>
+  </header>
+  <div class="tracker-map-key">
+    <div class="tracker-scale"></div>
+    <div class="flooding-legend tracker-panel" hidden>
+      <span>Days flooded · <span class="flooding-legend-year">2025</span></span>
+      <div class="flooding-ramp" aria-hidden="true"></div>
+      <div class="flooding-ramp-labels"><span>0</span><span>90+ days</span></div>
+    </div>
+    <div class="tracker-legend tracker-panel" hidden>
+      <div class="legend-heading"><div class="legend-items"></div><span class="zoom-level" aria-label="Map zoom level"></span></div>
+      <details class="result-details">
+        <summary>Comparison imagery &amp; details</summary>
+        <div class="result-details-body">
+          <p class="current-captures"></p>
+          <p class="previous-captures"></p>
+          <p class="alignment-details"></p>
+          <a class="result-download" download>Download GeoTIFF</a><br>
+          <a class="imagery-download" download hidden>Download used Sentinel-2 imagery (ZIP)</a><br>
+          <a class="change-download" download>Download rendered change (PNG)</a><br>
+          <a class="render-archive-download" download>Download all rendered levels (ZIP)</a>
+        </div>
+      </details>
+    </div>
+  </div>
+  <button class="tracker-settings-toggle tracker-panel" type="button" aria-label="Display settings"
+    aria-expanded="false">
+    <svg class="settings-icon" width="18" height="18" aria-hidden="true" viewBox="0 0 24 24">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+        d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46a.5.5 0 0 0-.6-.22l-2.49 1a7.3 7.3 0 0 0-1.69-.98l-.38-2.65A.49.49 0 0 0 14 2h-4a.49.49 0 0 0-.5.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.12.22.37.31.6.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.25 1.17-.58 1.69-.98l2.49 1c.23.09.48 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64zM12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 1 0 0-7Z" />
+    </svg>
+  </button>
+  <aside class="tracker-settings tracker-panel" aria-label="Display settings" hidden>
+    <strong>Display</strong>
+    <label class="obt-toggle-row"><input class="obt-toggle" type="checkbox" aria-controls="obt-options">Show Google OBT options</label>
+    <div class="display-theme"><span>Theme</span><div class="theme-switch" role="group" aria-label="Colour theme"><button type="button" data-theme-option="light" aria-pressed="false">Light</button><button type="button" data-theme-option="dark" aria-pressed="false">Dark</button></div></div>
+    <label>Background<select class="background-choice" aria-label="Background"><option value="openfreemap">OpenFreeMap</option><option value="wayback">Esri Wayback imagery</option></select></label>
+    <div class="wayback-options" hidden>
+      <label>Wayback release<select class="wayback-release" aria-label="Wayback release" disabled></select></label>
+      <p class="display-note">Release date, not the imagery capture date.</p>
+    </div>
+    <p class="background-status display-note" role="status" hidden></p>
+    <label class="flooding-toggle-row"><input class="flooding-toggle" type="checkbox">Show flooding</label>
+    <div class="flooding-options" hidden>
+      <label>Flooding year<select class="flooding-year" aria-label="Flooding year"></select></label>
+    </div>
+    <p class="flooding-status display-note" role="status" hidden></p>
+    <label>Prediction opacity <output class="opacity-value">100%</output><input class="overlay-opacity"
+        aria-label="Prediction opacity" type="range" min="0" max="100" value="100"></label>
+  </aside>
+  <div class="about-overlay" hidden>
+    <section class="about-dialog tracker-panel" id="about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-title" aria-describedby="about-description">
+      <div class="about-heading"><h2 id="about-title">About</h2><button type="button" class="about-close" aria-label="Close About"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+      <p id="about-description">Buildings in South Sudan detected from Sentinel-2 imagery using an automated model. This model makes mistakes and has difficulty spotting very small buildings - always combine with other sources.</p>
+      <p>Developed by Angus McBride - <a href="mailto:angusmcb@gmail.com">contact</a></p>
+      <h3>Sources</h3>
+      <p>Buildings: Derived from Sentinel-2<br>Flooding: Annual flood-duration rasters, 2016–2025.<br>Backgrounds: OpenFreeMap / <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a>, <a href="https://livingatlas.arcgis.com/wayback/" target="_blank" rel="noreferrer">Esri World Imagery Wayback</a> © Esri and its data providers.</p>
+    </section>
+  </div>
+</div>
+<script type="module" src="./assets/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{
+  "space": "https://angusmcb-south-sudan-building-maps.hf.space/",
+  "oauthClientId": "944fba2b-e77a-4aff-82fb-cca86cc11b0c",
+  "places": [
+    {
+      "name": "Juba",
+      "longitude": 31.5825,
+      "latitude": 4.8539
+    },
+    {
+      "name": "Bentiu",
+      "longitude": 29.8,
+      "latitude": 9.26
+    },
+    {
+      "name": "Lankien",
+      "longitude": 32.06189,
+      "latitude": 8.52488
+    },
+    {
+      "name": "Malakal",
+      "longitude": 31.65,
+      "latitude": 9.55
+    },
+    {
+      "name": "Yei",
+      "longitude": 30.67792,
+      "latitude": 4.09504
+    }
+  ],
+  "area_metres": 2000,
+  "preprocessed_maps": {
+    "obt-2019-2023": {
+      "url": "https://tiles.angusmcb.com/change_visualisation/obt_v2/2019-2023/south-sudan-2019-2023.pmtiles",
+      "minzoom": 0,
+      "maxzoom": 17
+    },
+    "obt-2016-2019": {
+      "url": "https://tiles.angusmcb.com/change_visualisation/obt_v2/2016-2019/south-sudan-2016-2019.pmtiles",
+      "minzoom": 0,
+      "maxzoom": 17
+    },
+    "change-2016-2019": {
+      "url": "https://tiles.angusmcb.com/change_visualisation/v2-hrnet185000/2016-2019/south-sudan-2016-2019.pmtiles",
+      "minzoom": 0,
+      "maxzoom": 17
+    },
+    "change-2019-2026": {
+      "url": "https://tiles.angusmcb.com/change_visualisation/v2-hrnet185000/2019-2026/south-sudan-2019-2026.pmtiles",
+      "minzoom": 0,
+      "maxzoom": 17
+    }
+  },
+  "flooding_maps": {
+    "2016": "https://tiles.angusmcb.com/flooding/v1-days-flooded-webmercator-zstd/2016_days_flooded_3857.tif",
+    "2017": "https://tiles.angusmcb.com/flooding/v1-days-flooded-webmercator-zstd/2017_days_flooded_3857.tif",
+    "2018": "https://tiles.angusmcb.com/flooding/v1-days-flooded-webmercator-zstd/2018_days_flooded_3857.tif",
+    "2019": "https://tiles.angusmcb.com/flooding/v1-days-flooded-webmercator-zstd/2019_days_flooded_3857.tif",
+    "2020": "https://tiles.angusmcb.com/flooding/v1-days-flooded-webmercator-zstd/2020_days_flooded_3857.tif",
+    "2021": "https://tiles.angusmcb.com/flooding/v1-days-flooded-webmercator-zstd/2021_days_flooded_3857.tif",
+    "2022": "https://tiles.angusmcb.com/flooding/v1-days-flooded-webmercator-zstd/2022_days_flooded_3857.tif",
+    "2023": "https://tiles.angusmcb.com/flooding/v1-days-flooded-webmercator-zstd/2023_days_flooded_3857.tif",
+    "2024": "https://tiles.angusmcb.com/flooding/v1-days-flooded-webmercator-zstd/2024_days_flooded_3857.tif",
+    "2025": "https://tiles.angusmcb.com/flooding/v1-days-flooded-webmercator-zstd/2025_days_flooded_3857.tif"
+  }
+}

@@ -2,16 +2,8 @@ import {createAccount} from './account.js';
 import {mountMap} from './map.js';
 import {createSpaceClient} from './space.js';
 
-async function loadJson(path) {
-  const response = await fetch(new URL(path, import.meta.url));
-  if (!response.ok) throw new Error('Could not load map configuration.');
-  return response.json();
-}
-
 async function start() {
-  const [config, coverage, light, dark] = await Promise.all([
-    loadJson('config.json'), loadJson('coverage.geojson'), loadJson('context-light.json'), loadJson('context-dark.json')
-  ]);
+  const config = JSON.parse(document.querySelector('#map-bootstrap').textContent);
   const redirect = new URL('../', import.meta.url).href;
   const account = createAccount(config.oauthClientId, redirect);
   let accountError;
@@ -20,7 +12,7 @@ async function start() {
   } catch (error) {
     accountError = error.message;
   }
-  mountMap(document.body, {...config, coverage, map_styles: {light, dark}},
+  mountMap(document.body, config,
     account, createSpaceClient(config.space, account.getToken), accountError);
 }
 

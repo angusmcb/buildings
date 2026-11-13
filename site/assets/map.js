@@ -47,6 +47,7 @@ export function mountMap(element,props,auth,submit,accountError) {
   }
   let preferredTheme=loadThemePreference();
   let theme = preferredTheme || (appearance.matches ? 'dark' : 'light');
+  root.dataset.theme=theme;
   let basemapTheme=theme, basemapReady=false;
   let appMode='archive', archiveId='change-2019-2026';
   let modelArchiveId=archiveId;
@@ -391,6 +392,14 @@ export function mountMap(element,props,auth,submit,accountError) {
     renderImages(current,true); updateSelection();raiseMapLabels();
   }
   map.on('style.load',()=>{installLayers();updateFlooding();});
+  // The canvas can paint before the initial vector tiles supply the land.
+  // Keep the theme background visible until MapLibre renders that basemap.
+  function revealBasemap() {
+    if (!basemapReady || !map.isSourceLoaded('openmaptiles')) return;
+    delete container.dataset.loading;
+    map.off('render',revealBasemap);
+  }
+  map.on('render',revealBasemap);
   function updateZoomIndicator() {
     const zoom=map.getZoom().toFixed(1),indicator=legend.querySelector('.zoom-level');
     indicator.textContent='z '+zoom;
@@ -428,7 +437,19 @@ export function mountMap(element,props,auth,submit,accountError) {
       return {...response,data:await createImageBitmap(response.data,{premultiplyAlpha:'premultiply'})};
     } finally {response.data.close();}
   }
-  function updateFlooding() {
+  let floodingLibrary;
+  function loadFloodingLibrary() {
+    if (typeof MaplibreCOGProtocol!=='undefined') return Promise.resolve();
+    floodingLibrary ??= new Promise((resolve,reject)=>{
+      const script=document.createElement('script');
+      script.src='https://unpkg.com/@geomatico/maplibre-cog-protocol@0.10.0/dist/index.js';
+      script.onload=resolve;
+      script.onerror=()=>{script.remove();reject(new Error('Could not load the flooding library.'));};
+      document.head.append(script);
+    }).catch(error=>{floodingLibrary=null;throw error;});
+    return floodingLibrary;
+  }
+  async function updateFlooding() {
     const enabled=floodingToggle.checked,year=floodingYear.value;
     root.querySelector('.flooding-options').hidden=!enabled;
     floodingLegend.hidden=!enabled;
@@ -441,10 +462,16 @@ export function mountMap(element,props,auth,submit,accountError) {
     }
     const url=props.flooding_maps?.[year];
     if(!url)return;
-    if(typeof MaplibreCOGProtocol==='undefined') {
-      floodingStatus.textContent='Flooding could not load. Please reload the page.';
-      floodingStatus.hidden=false;return;
+    try {
+      await loadFloodingLibrary();
+    } catch {
+      if (floodingToggle.checked && floodingYear.value===year) {
+        floodingStatus.textContent='Flooding could not load. Toggle it to retry.';
+        floodingStatus.hidden=false;
+      }
+      return;
     }
+    if (!floodingToggle.checked || floodingYear.value!==year) return;
     if(!window.settlementCOGProtocol) {
       maplibregl.addProtocol('cog',floodingProtocol);
       window.settlementCOGProtocol=true;

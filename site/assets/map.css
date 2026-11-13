@@ -66,8 +66,8 @@
 .tracker .maplibregl-popup-tip{display:none}
 .tracker .result-header{width:max-content;font:12px/1.5 system-ui,sans-serif;color:var(--ink)}
 .tracker .result-modes{display:flex;align-items:flex-end;gap:3px}
-.tracker .result-modes button{flex:0 0 auto;white-space:nowrap;font-size:12px;line-height:1.4;padding:6px 9px;min-height:31px;border:1px solid var(--line);border-bottom-color:var(--teal);border-radius:6px 6px 0 0;background:var(--paper);color:var(--label)}
-.tracker .result-modes button[aria-pressed=true]{min-height:34px;border-color:#2e7e72;background:#2e7e72;color:#fff;font-weight:600}
+.tracker .result-modes button{flex:0 0 auto;white-space:nowrap;font-size:12px;line-height:1.4;padding:6px 9px;min-height:31px;border:1px solid var(--line);border-radius:6px 6px 0 0;background:var(--paper);color:var(--label)}
+.tracker .result-modes button[aria-pressed=true]{position:relative;top:2px;min-height:34px;border-color:#2e7e72;background:#2e7e72;color:#fff;font-weight:600}
 .tracker .result-modes button:focus-visible{outline:2px solid var(--teal);outline-offset:-3px}
 .tracker .result-modes button[aria-pressed=true]:focus-visible{outline-color:#fff}
 .tracker .result-details,.tracker .result-details summary,.tracker .result-details p,.tracker .result-details a{font:inherit}

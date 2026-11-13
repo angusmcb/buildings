@@ -339,7 +339,8 @@ export function mountMap(element,props,auth,submit,accountError) {
     if (value.render_archive_url) archive.href=new URL(value.render_archive_url,props.space).href;
     resultBody.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>{mode=button.dataset.mode;setDisplay();}));
     for (const event of ['click','dblclick','pointerdown','mousedown','touchstart','wheel']) resultBody.addEventListener(event,event=>event.stopPropagation());
-    resultPopup=new maplibregl.Popup({closeButton:false,closeOnClick:false,focusAfterOpen:false,anchor:'bottom-left',offset:[-1,1],maxWidth:'none'})
+    // Align the inactive tab above the 2 px outline. The active tab overlaps it.
+    resultPopup=new maplibregl.Popup({closeButton:false,closeOnClick:false,focusAfterOpen:false,anchor:'bottom-left',offset:[-1,-1],maxWidth:'none'})
       .setLngLat(value.area_ring[0]).setDOMContent(resultBody).addTo(map);
     setDisplay();
   }

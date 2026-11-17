@@ -551,11 +551,11 @@ export function mountMap(element,props,auth,submit,accountError) {
     const {ink,halo}=mgrsColors();
     map.addSource('mgrs-grid',{type:'geojson',data:{type:'FeatureCollection',features}});
     map.addLayer({id:'mgrs-grid',type:'line',source:'mgrs-grid',
-      paint:{'line-color':ink,'line-width':1.25,'line-opacity':0.75}},'selection-line');
+      paint:{'line-color':ink,'line-width':1.25,'line-opacity':0.6}},'selection-line');
     map.addLayer({id:'mgrs-labels',type:'symbol',source:'mgrs-grid',minzoom:5,
       filter:['has','tile'],
       layout:{'text-field':['get','tile'],'text-font':['system-ui','Arial','sans-serif'],'text-size':11},
-      paint:{'text-color':ink,'text-halo-color':halo,'text-halo-width':1.5}},'selection-line');
+      paint:{'text-color':ink,'text-opacity':0.8,'text-halo-color':halo,'text-halo-width':1.5}},'selection-line');
   }
   mgrsToggle.addEventListener('change',updateMgrsGrid);
   async function selectLocation(point,shortcut=false) {

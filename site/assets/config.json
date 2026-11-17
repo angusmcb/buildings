@@ -29,6 +29,7 @@
     }
   ],
   "area_metres": 2000,
+  "default_archive": "change-2019-2026",
   "preprocessed_maps": {
     "obt-2019-2023": {
       "url": "https://tiles.angusmcb.com/change_visualisation/obt_v2/2019-2023/south-sudan-2019-2023.pmtiles",

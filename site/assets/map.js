@@ -49,7 +49,7 @@ export function mountMap(element,props,auth,submit,accountError) {
   let theme = preferredTheme || (appearance.matches ? 'dark' : 'light');
   root.dataset.theme=theme;
   let basemapTheme=theme, basemapReady=false;
-  let appMode='archive', archiveId='change-2019-2026';
+  let appMode='archive', archiveId=props.default_archive;
   let modelArchiveId=archiveId;
   const obtToggle=root.querySelector('.obt-toggle');
   const obtOptions=root.querySelector('.obt-options');
@@ -139,10 +139,6 @@ export function mountMap(element,props,auth,submit,accountError) {
   }
   function feature(area) {
     return area ? {type:'FeatureCollection',features:[{type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[area.ring]}}]} : empty;
-  }
-  if (!window.settlementPMTilesProtocol) {
-    window.settlementPMTilesProtocol=new pmtiles.Protocol();
-    maplibregl.addProtocol('pmtiles',window.settlementPMTilesProtocol.tile);
   }
   const map = new maplibregl.Map({
     container, style:props.map_styles[theme], bounds:coverage.bounds,

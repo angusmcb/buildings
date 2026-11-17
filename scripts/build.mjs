@@ -1,5 +1,6 @@
 import {mkdir, readFile, rm, writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
+import {prefetchArchive} from '../site/assets/archive.js';
 
 const site = new URL('../site/', import.meta.url);
 const dist = new URL('../dist/', import.meta.url);
@@ -25,6 +26,7 @@ const [template, config, coverage, light, dark, css, entry, ...modules] = await 
   read('assets/map.css'),
   read('assets/main.js'),
   read('assets/account.js'),
+  read('assets/archive.js'),
   read('assets/map.js'),
   read('assets/space.js'),
 ]);
@@ -58,10 +60,11 @@ const licenseNotices = await Promise.all([
 // Keep the data editable as JSON and ship it in the initial HTML response.
 const bootstrap = JSON.stringify({...config, coverage, map_styles: {light, dark}, vendor_scripts: vendorScripts})
   .replaceAll('<', '\\u003c');
-// These three modules have no dependencies of their own. Their exports are
+// These modules have no dependencies of their own. Their exports are
 // in scope in the inline module, so remove the corresponding entry imports.
 const startup = entry
   .replace("import {createAccount} from './account.js';\n", '')
+  .replace("import {prefetchedArchiveSource} from './archive.js';\n", '')
   .replace("import {mountMap} from './map.js';\n", '')
   .replace("import {createSpaceClient} from './space.js';\n", '');
 const script = [...modules, startup].join('\n');
@@ -69,7 +72,10 @@ if (/^\s*import\s/m.test(script)) {
   throw new Error('Update the inline build to include the new module imports.');
 }
 
+const defaultArchiveUrl = JSON.stringify(config.preprocessed_maps[config.default_archive].url).replaceAll('<', '\\u003c');
 const html = template
+  .replace('<!-- archive-prefetch -->', () => inline('script',
+    'window.settlementArchivePrefetch = (' + prefetchArchive + ')(' + defaultArchiveUrl + ');'))
   .replace('<!-- map-bootstrap -->', () => '<script type="application/json" id="map-bootstrap">' + bootstrap + '</script>')
   .replace('<link rel="stylesheet" href="./assets/map.css">', () => inline('style', maplibreCss + '\n' + css))
   .replace('<script type="module" src="./assets/main.js"></script>', () => [

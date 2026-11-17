@@ -94,14 +94,14 @@
       <label class="display-check"><input class="mgrs-toggle" type="checkbox" autocomplete="off">Show MGRS grid</label>
       <p class="mgrs-status display-note" role="status" hidden></p>
       <label class="display-check"><input class="osm-toggle" type="checkbox" autocomplete="off" checked>OSM background</label>
-      <label class="display-check"><input class="flooding-toggle" type="checkbox" aria-controls="flooding-options">Show flooding</label>
-      <div class="flooding-options display-suboptions" id="flooding-options" hidden>
-        <label>Flooding year<select class="flooding-year"></select></label>
+      <div class="display-layer-row">
+        <label class="display-check"><input class="flooding-toggle" type="checkbox" aria-controls="flooding-options">Show flooding</label>
+        <select class="flooding-year" id="flooding-options" aria-label="Flooding year" hidden></select>
       </div>
       <p class="flooding-status display-note" role="status" hidden></p>
-      <label class="display-check"><input class="satellite-toggle" type="checkbox" autocomplete="off" aria-controls="wayback-options">Satellite imagery</label>
-      <div class="wayback-options display-suboptions" id="wayback-options" hidden>
-        <label>Esri Wayback release<select class="wayback-release" disabled></select></label>
+      <div class="display-layer-row">
+        <label class="display-check"><input class="satellite-toggle" type="checkbox" autocomplete="off" aria-controls="wayback-options">Satellite</label>
+        <select class="wayback-release" id="wayback-options" aria-label="Esri Wayback release" disabled hidden></select>
       </div>
       <p class="background-status display-note" role="status" hidden></p>
     </fieldset>

@@ -57,7 +57,6 @@ export function mountMap(element,props,auth,submit,accountError) {
   const obtOptions=root.querySelector('.obt-options');
   const osmToggle=root.querySelector('.osm-toggle');
   const satelliteToggle=root.querySelector('.satellite-toggle');
-  const waybackOptions=root.querySelector('.wayback-options');
   const waybackRelease=root.querySelector('.wayback-release');
   const backgroundStatus=root.querySelector('.background-status');
   let waybackItems=[],waybackLoading=null,activeWaybackUrl=null;
@@ -453,7 +452,7 @@ export function mountMap(element,props,auth,submit,accountError) {
   }
   async function updateFlooding() {
     const enabled=floodingToggle.checked,year=floodingYear.value;
-    root.querySelector('.flooding-options').hidden=!enabled;
+    floodingYear.hidden=!enabled;
     floodingLegend.hidden=!enabled;
     floodingLegend.querySelector('.flooding-legend-year').textContent=year;
     floodingStatus.hidden=true;
@@ -781,15 +780,15 @@ export function mountMap(element,props,auth,submit,accountError) {
   }
   osmToggle.addEventListener('change',updateBackground);
   satelliteToggle.addEventListener('change',async()=>{
-    waybackOptions.hidden=!satelliteToggle.checked;
+    waybackRelease.hidden=!satelliteToggle.checked;
     backgroundStatus.hidden=true;
     if(satelliteToggle.checked&&!waybackItems.length) {
       backgroundStatus.textContent='Loading releases…';backgroundStatus.hidden=false;
       try {await loadWaybackReleases();}
       catch {
         if(!satelliteToggle.checked)return;
-        satelliteToggle.checked=false;waybackOptions.hidden=true;
-        backgroundStatus.textContent='Could not load Wayback releases. Tick Satellite imagery to retry.';
+        satelliteToggle.checked=false;waybackRelease.hidden=true;
+        backgroundStatus.textContent='Could not load Wayback releases. Tick Satellite to retry.';
         return;
       }
       backgroundStatus.hidden=true;

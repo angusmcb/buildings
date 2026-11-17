@@ -51,14 +51,13 @@
 .tracker-settings label{display:block;margin-top:8px;color:var(--label);font-size:12px}
 .tracker-settings output{float:right}
 .tracker-settings input[type=range]{display:block;width:100%;accent-color:var(--teal)}
-.tracker-settings select{display:block;width:100%;margin-top:4px;padding:5px 7px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink);font:12px/1.5 system-ui,sans-serif}
+.tracker-settings select{display:block;min-width:0;width:100%;padding:5px 7px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink);font:12px/1.5 system-ui,sans-serif}
 .tracker-settings .display-note{margin:6px 0 0;color:var(--label);font:11px/1.4 system-ui,sans-serif}
 .tracker-settings .display-group{min-width:0;border:0;border-top:1px solid var(--line);margin:10px 0 0;padding:0}
 .tracker-settings .display-group legend{padding:0 6px 0 0;color:var(--ink);font-size:12px;font-weight:600}
 .tracker-settings .display-check{display:flex;align-items:center;gap:7px;min-height:29px;margin:0}
 .tracker-settings .display-check input{appearance:auto;flex:0 0 auto;width:16px;height:16px;margin:0;accent-color:#2254d1}
-.tracker-settings .display-suboptions{margin:0 0 5px 23px}
-.tracker-settings .display-suboptions label{margin-top:0}
+.tracker-settings .display-layer-row{display:grid;grid-template-columns:minmax(0,1fr) 116px;align-items:center;gap:6px}
 @media(pointer:coarse){.tracker-settings .display-check{min-height:44px}.tracker-settings select{min-height:44px;font-size:16px}}
 .tracker .flooding-legend{width:170px;padding:8px 11px;font-size:11px}
 .tracker .flooding-ramp{height:8px;margin-top:5px;border-radius:2px;background:linear-gradient(to right,rgba(34,84,209,0),rgba(34,84,209,.75))}

@@ -447,7 +447,7 @@ export function mountMap(element,props,auth,submit,accountError) {
   }
   let floodingLibrary;
   function loadFloodingLibrary() {
-    floodingLibrary ??= loadScript('https://unpkg.com/@geomatico/maplibre-cog-protocol@0.10.0/dist/index.js')
+    floodingLibrary ??= loadScript(props.vendor_scripts.flooding)
       .catch(error=>{floodingLibrary=null;throw error;});
     return floodingLibrary;
   }
@@ -508,7 +508,7 @@ export function mountMap(element,props,auth,submit,accountError) {
   }
   let projectionLibrary, selectionAttempt=0;
   function loadProjectionLibrary() {
-    projectionLibrary ??= loadScript('https://unpkg.com/proj4@2.12.1/dist/proj4.js')
+    projectionLibrary ??= loadScript(props.vendor_scripts.projection)
       .catch(error=>{projectionLibrary=null;throw error;});
     return projectionLibrary;
   }

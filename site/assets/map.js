@@ -783,15 +783,14 @@ export function mountMap(element,props,auth,submit,accountError) {
     waybackRelease.hidden=!satelliteToggle.checked;
     backgroundStatus.hidden=true;
     if(satelliteToggle.checked&&!waybackItems.length) {
-      backgroundStatus.textContent='Loading releases…';backgroundStatus.hidden=false;
       try {await loadWaybackReleases();}
       catch {
         if(!satelliteToggle.checked)return;
         satelliteToggle.checked=false;waybackRelease.hidden=true;
         backgroundStatus.textContent='Could not load Wayback releases. Tick Satellite to retry.';
+        backgroundStatus.hidden=false;
         return;
       }
-      backgroundStatus.hidden=true;
     }
     updateBackground();
   });

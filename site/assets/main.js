@@ -4,7 +4,7 @@ import {createSpaceClient} from './space.js';
 
 async function start() {
   const config = JSON.parse(document.querySelector('#map-bootstrap').textContent);
-  const redirect = new URL('../', import.meta.url).href;
+  const redirect = new URL('./', location.href).href;
   const account = createAccount(config.oauthClientId, redirect);
   let accountError;
   try {

@@ -57,6 +57,9 @@ export function mountMap(element,props,auth,submit,accountError) {
   const waybackRelease=root.querySelector('.wayback-release');
   const backgroundStatus=root.querySelector('.background-status');
   let waybackItems=[],waybackLoading=null,activeWaybackUrl=null;
+  const mgrsToggle=root.querySelector('.mgrs-toggle');
+  const mgrsStatus=root.querySelector('.mgrs-status');
+  const mgrsLayers=['mgrs-grid','mgrs-labels'];
   const floodingToggle=root.querySelector('.flooding-toggle');
   const floodingYear=root.querySelector('.flooding-year');
   const floodingStatus=root.querySelector('.flooding-status');
@@ -218,6 +221,7 @@ export function mountMap(element,props,auth,submit,accountError) {
     for(const layer of props.map_styles[theme].layers) {
       if(layer.type==='symbol'&&map.getLayer(layer.id))map.moveLayer(layer.id,'selection-line');
     }
+    for(const id of mgrsLayers)if(map.getLayer(id))map.moveLayer(id,'selection-line');
   }
   function imageLayer(id,url,coordinates) {
     if (!url || !map.getSource('selection')) return;
@@ -394,7 +398,7 @@ export function mountMap(element,props,auth,submit,accountError) {
     installArchiveLayer();
     renderImages(current,true); updateSelection();raiseMapLabels();
   }
-  map.on('style.load',()=>{installLayers();updateFlooding();});
+  map.on('style.load',()=>{installLayers();updateFlooding();updateMgrsGrid();});
   function updateZoomIndicator() {
     const zoom=map.getZoom().toFixed(1),indicator=legend.querySelector('.zoom-level');
     indicator.textContent='z '+zoom;
@@ -508,6 +512,52 @@ export function mountMap(element,props,auth,submit,accountError) {
       .catch(error=>{projectionLibrary=null;throw error;});
     return projectionLibrary;
   }
+  function mgrsColors() {
+    return theme==='dark'?{ink:'#f0cb74',halo:'#1c1b18'}:{ink:'#784908',halo:'#fff7df'};
+  }
+  async function updateMgrsGrid() {
+    mgrsStatus.hidden=true;
+    if(!map.getLayer('selection-line'))return;
+    if(!mgrsToggle.checked || map.getSource('mgrs-grid')) {
+      for(const id of mgrsLayers)if(map.getLayer(id)) {
+        map.setLayoutProperty(id,'visibility',mgrsToggle.checked?'visible':'none');
+      }
+      return;
+    }
+    try {
+      await loadProjectionLibrary();
+    } catch {
+      if(mgrsToggle.checked) {
+        mgrsStatus.textContent='MGRS grid could not load. Toggle it to retry.';
+        mgrsStatus.hidden=false;
+      }
+      return;
+    }
+    if(!mgrsToggle.checked || !map.getLayer('selection-line') || map.getSource('mgrs-grid'))return;
+    const features=coverage.tiles.flatMap(({tile,zone,bounds:[left,bottom,right,top]})=>{
+      const project=proj4('+proj=utm +zone='+zone+' +datum=WGS84 +units=m +no_defs','EPSG:4326');
+      const corners=[[left,bottom],[right,bottom],[right,top],[left,top],[left,bottom]];
+      // Sample each edge in UTM so the projected grid follows the tile boundary.
+      const outline=corners.slice(0,-1).flatMap(([x,y],i)=>{
+        const [endX,endY]=corners[i+1];
+        return [0,0.25,0.5,0.75].map(t=>project.forward([x+(endX-x)*t,y+(endY-y)*t]));
+      });
+      outline.push(outline[0]);
+      return [
+        {type:'Feature',properties:{},geometry:{type:'LineString',coordinates:outline}},
+        {type:'Feature',properties:{tile},geometry:{type:'Point',coordinates:project.forward([(left+right)/2,(bottom+top)/2])}},
+      ];
+    });
+    const {ink,halo}=mgrsColors();
+    map.addSource('mgrs-grid',{type:'geojson',data:{type:'FeatureCollection',features}});
+    map.addLayer({id:'mgrs-grid',type:'line',source:'mgrs-grid',
+      paint:{'line-color':ink,'line-width':1.25,'line-opacity':0.75}},'selection-line');
+    map.addLayer({id:'mgrs-labels',type:'symbol',source:'mgrs-grid',minzoom:5,
+      filter:['has','tile'],
+      layout:{'text-field':['get','tile'],'text-font':['system-ui','Arial','sans-serif'],'text-size':11},
+      paint:{'text-color':ink,'text-halo-color':halo,'text-halo-width':1.5}},'selection-line');
+  }
+  mgrsToggle.addEventListener('change',updateMgrsGrid);
   async function selectLocation(point,shortcut=false) {
     if (busy||appMode!=='live') return false;
     const attempt=++selectionAttempt;
@@ -767,6 +817,12 @@ export function mountMap(element,props,auth,submit,accountError) {
       map.setPaintProperty(id,'line-color',theme==='dark'?'#4aa894':'#2e7e72');
     }
     if(map.getLayer('coverage-mask'))map.setPaintProperty('coverage-mask','fill-color',theme==='dark'?'#070907':'#8f928a');
+    if(map.getLayer('mgrs-grid')) {
+      const {ink,halo}=mgrsColors();
+      map.setPaintProperty('mgrs-grid','line-color',ink);
+      map.setPaintProperty('mgrs-labels','text-color',ink);
+      map.setPaintProperty('mgrs-labels','text-halo-color',halo);
+    }
     basemapTheme=theme;
     updateBackground();
   }

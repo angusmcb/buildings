@@ -53,8 +53,8 @@
 .tracker-settings input[type=range]{display:block;width:100%;accent-color:var(--teal)}
 .tracker-settings select{display:block;width:100%;margin-top:4px;padding:5px 7px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink);font:12px/1.5 system-ui,sans-serif}
 .tracker-settings .display-note{margin:6px 0 0;color:var(--label);font:11px/1.4 system-ui,sans-serif}
-.tracker-settings .flooding-toggle-row,.tracker-settings .obt-toggle-row{display:flex;align-items:center;gap:7px;padding-top:8px;margin-top:10px;border-top:1px solid var(--line)}
-.tracker-settings .flooding-toggle,.tracker-settings .obt-toggle{appearance:auto;flex:0 0 auto;width:16px;height:16px;margin:0;accent-color:#2254d1}
+.tracker-settings .mgrs-toggle-row,.tracker-settings .flooding-toggle-row,.tracker-settings .obt-toggle-row{display:flex;align-items:center;gap:7px;padding-top:8px;margin-top:10px;border-top:1px solid var(--line)}
+.tracker-settings .mgrs-toggle,.tracker-settings .flooding-toggle,.tracker-settings .obt-toggle{appearance:auto;flex:0 0 auto;width:16px;height:16px;margin:0;accent-color:#2254d1}
 .tracker .flooding-legend{width:170px;padding:8px 11px;font-size:11px}
 .tracker .flooding-ramp{height:8px;margin-top:5px;border-radius:2px;background:linear-gradient(to right,rgba(34,84,209,0),rgba(34,84,209,.75))}
 .tracker .flooding-ramp-labels{display:flex;justify-content:space-between;color:var(--label);font-size:10px;margin-top:2px}

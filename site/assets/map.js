@@ -30,6 +30,8 @@ export function mountMap(element,props,auth,submit,accountError) {
     }
   });
   const opacity = root.querySelector('.overlay-opacity');
+  const opacityValue = root.querySelector('.opacity-value');
+  let predictionOpacity = Number(opacity.defaultValue);
   const appearance = matchMedia('(prefers-color-scheme: dark)');
   const coverage = props.coverage;
   const empty = {type:'FeatureCollection',features:[]};
@@ -269,14 +271,14 @@ export function mountMap(element,props,auth,submit,accountError) {
     for(const period of Object.keys(props.preprocessed_maps||{})) {
       for(const id of ['preprocessed-map-'+period,'preprocessed-overview-'+period])if(map.getLayer(id)) {
         map.setLayoutProperty(id,'visibility',!live&&period===archiveId?'visible':'none');
-        map.setPaintProperty(id,'raster-opacity',Number(opacity.value)/100);
+        map.setPaintProperty(id,'raster-opacity',predictionOpacity/100);
       }
     }
     if (map.getLayer('sentinel-image')) map.setLayoutProperty('sentinel-image','visibility',live&&mode==='buildings'?'visible':'none');
     for (const key of ['buildings','settlement']) {
       if (map.getLayer(key)) {
         map.setLayoutProperty(key,'visibility',live&&key===mode?'visible':'none');
-        map.setPaintProperty(key,'raster-opacity',Number(opacity.value)/100);
+        map.setPaintProperty(key,'raster-opacity',predictionOpacity/100);
       }
     }
     resultBody?.querySelectorAll('[data-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)));
@@ -718,7 +720,18 @@ export function mountMap(element,props,auth,submit,accountError) {
       setSettingsOpen(false);settingsToggle.focus({preventScroll:true});
     }
   });
-  opacity.addEventListener('input',()=>{root.querySelector('.opacity-value').textContent=opacity.value+'%';setDisplay();});
+  function syncPredictionOpacity() {
+    opacity.value=String(predictionOpacity);
+    opacityValue.textContent=predictionOpacity+'%';
+  }
+  // Firefox can restore a range input's value after the map has initialized.
+  syncPredictionOpacity();
+  window.addEventListener('pageshow',syncPredictionOpacity);
+  opacity.addEventListener('input',()=>{
+    predictionOpacity=Number(opacity.value);
+    syncPredictionOpacity();
+    setDisplay();
+  });
   function parseWaybackCatalog(catalog) {
     return Object.values(catalog).flatMap(item=>{
       const date=item.itemTitle?.match(/Wayback (\d{4}-\d{2}-\d{2})/)?.[1];

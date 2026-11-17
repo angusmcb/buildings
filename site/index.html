@@ -87,23 +87,29 @@
   </button>
   <aside class="tracker-settings tracker-panel" aria-label="Display settings" hidden>
     <strong>Display</strong>
-    <label class="obt-toggle-row"><input class="obt-toggle" type="checkbox" aria-controls="obt-options">Show Google OBT options</label>
     <div class="display-theme"><span>Theme</span><div class="theme-switch" role="group" aria-label="Colour theme"><button type="button" data-theme-option="light" aria-pressed="false">Light</button><button type="button" data-theme-option="dark" aria-pressed="false">Dark</button></div></div>
-    <label>Background<select class="background-choice" aria-label="Background"><option value="openfreemap">OpenFreeMap</option><option value="wayback">Esri Wayback imagery</option></select></label>
-    <div class="wayback-options" hidden>
-      <label>Wayback release<select class="wayback-release" aria-label="Wayback release" disabled></select></label>
-      <p class="display-note">Release date, not the imagery capture date.</p>
-    </div>
-    <p class="background-status display-note" role="status" hidden></p>
-    <label class="mgrs-toggle-row"><input class="mgrs-toggle" type="checkbox" autocomplete="off">Show MGRS grid</label>
-    <p class="mgrs-status display-note" role="status" hidden></p>
-    <label class="flooding-toggle-row"><input class="flooding-toggle" type="checkbox">Show flooding</label>
-    <div class="flooding-options" hidden>
-      <label>Flooding year<select class="flooding-year" aria-label="Flooding year"></select></label>
-    </div>
-    <p class="flooding-status display-note" role="status" hidden></p>
-    <label>Prediction opacity <output class="opacity-value">100%</output><input class="overlay-opacity"
-        aria-label="Prediction opacity" type="range" min="0" max="100" value="100"></label>
+    <fieldset class="display-group">
+      <legend>Map layers</legend>
+      <label class="display-check"><input class="mgrs-toggle" type="checkbox" autocomplete="off">Show MGRS grid</label>
+      <p class="mgrs-status display-note" role="status" hidden></p>
+      <label class="display-check"><input class="osm-toggle" type="checkbox" autocomplete="off" checked>OSM background</label>
+      <label class="display-check"><input class="flooding-toggle" type="checkbox" aria-controls="flooding-options">Show flooding</label>
+      <div class="flooding-options display-suboptions" id="flooding-options" hidden>
+        <label>Flooding year<select class="flooding-year"></select></label>
+      </div>
+      <p class="flooding-status display-note" role="status" hidden></p>
+      <label class="display-check"><input class="satellite-toggle" type="checkbox" autocomplete="off" aria-controls="wayback-options">Satellite imagery</label>
+      <div class="wayback-options display-suboptions" id="wayback-options" hidden>
+        <label>Esri Wayback release<select class="wayback-release" disabled></select></label>
+      </div>
+      <p class="background-status display-note" role="status" hidden></p>
+    </fieldset>
+    <fieldset class="display-group">
+      <legend>Predictions</legend>
+      <label class="display-check"><input class="obt-toggle" type="checkbox" aria-controls="obt-options">Show Google OBT options</label>
+      <label>Prediction opacity <output class="opacity-value">100%</output><input class="overlay-opacity"
+          aria-label="Prediction opacity" type="range" min="0" max="100" value="100"></label>
+    </fieldset>
   </aside>
   <div class="about-overlay" hidden>
     <section class="about-dialog tracker-panel" id="about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-title" aria-describedby="about-description">

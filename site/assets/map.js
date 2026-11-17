@@ -53,7 +53,9 @@ export function mountMap(element,props,auth,submit,accountError) {
   let modelArchiveId=archiveId;
   const obtToggle=root.querySelector('.obt-toggle');
   const obtOptions=root.querySelector('.obt-options');
-  const backgroundChoice=root.querySelector('.background-choice');
+  const osmToggle=root.querySelector('.osm-toggle');
+  const satelliteToggle=root.querySelector('.satellite-toggle');
+  const waybackOptions=root.querySelector('.wayback-options');
   const waybackRelease=root.querySelector('.wayback-release');
   const backgroundStatus=root.querySelector('.background-status');
   let waybackItems=[],waybackLoading=null,activeWaybackUrl=null;
@@ -755,36 +757,40 @@ export function mountMap(element,props,auth,submit,accountError) {
   }
   function updateBackground() {
     if(!basemapReady||!map.getLayer('coverage-mask'))return;
-    const item=backgroundChoice.value==='wayback'?waybackItems.find(item=>item.date===waybackRelease.value):null;
-    for(const layer of props.map_styles[theme].layers) {
-      if(layer.type!=='background'&&map.getLayer(layer.id))map.setLayoutProperty(layer.id,'visibility',item?'none':layer.layout?.visibility??'visible');
+    const item=satelliteToggle.checked?waybackItems.find(item=>item.date===waybackRelease.value):null;
+    const osmLayers=props.map_styles[theme].layers.filter(layer=>layer.type!=='background'&&map.getLayer(layer.id));
+    for(const layer of osmLayers) {
+      // With imagery underneath, keep OSM linework and labels visible over it.
+      const show=osmToggle.checked&&(!item||layer.type==='line'||layer.type==='symbol');
+      map.setLayoutProperty(layer.id,'visibility',show?(layer.layout?.visibility??'visible'):'none');
     }
     updateWaybackTiles(item);
     if(map.getLayer('wayback-background')) {
       map.setLayoutProperty('wayback-background','visibility',item?'visible':'none');
-      // Theme changes reorder basemap layers; keep imagery above their background.
-      map.moveLayer('wayback-background','coverage-mask');
+      map.moveLayer('wayback-background',osmLayers[0]?.id||'coverage-mask');
     }
   }
-  backgroundChoice.addEventListener('change',async()=>{
-    const wayback=backgroundChoice.value==='wayback';
-    root.querySelector('.wayback-options').hidden=!wayback;
+  osmToggle.addEventListener('change',updateBackground);
+  satelliteToggle.addEventListener('change',async()=>{
+    waybackOptions.hidden=!satelliteToggle.checked;
     backgroundStatus.hidden=true;
-    if(wayback) {
+    if(satelliteToggle.checked&&!waybackItems.length) {
       backgroundStatus.textContent='Loading releases…';backgroundStatus.hidden=false;
-      try {await loadWaybackReleases();backgroundStatus.hidden=true;}
+      try {await loadWaybackReleases();}
       catch {
-        if(backgroundChoice.value!=='wayback')return;
-        backgroundChoice.value='openfreemap';root.querySelector('.wayback-options').hidden=true;
-        backgroundStatus.textContent='Could not load Wayback releases. Select Esri Wayback to retry.';backgroundStatus.hidden=false;
+        if(!satelliteToggle.checked)return;
+        satelliteToggle.checked=false;waybackOptions.hidden=true;
+        backgroundStatus.textContent='Could not load Wayback releases. Tick Satellite imagery to retry.';
+        return;
       }
+      backgroundStatus.hidden=true;
     }
     updateBackground();
   });
   waybackRelease.addEventListener('change',()=>{
     backgroundStatus.hidden=true;
     // A release change must not restyle, reorder or reload the building layers.
-    if(backgroundChoice.value==='wayback')updateWaybackTiles(waybackItems.find(item=>item.date===waybackRelease.value));
+    if(satelliteToggle.checked)updateWaybackTiles(waybackItems.find(item=>item.date===waybackRelease.value));
   });
   function updateBasemapTheme() {
     if(!basemapReady||basemapTheme===theme)return;

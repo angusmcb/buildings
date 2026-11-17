@@ -47,14 +47,19 @@
 .tracker .legend-swatch.growth{background:#2e7e72}
 .tracker .legend-swatch.context{background:#918e82}
 .tracker .tracker-settings-toggle{position:absolute;z-index:4;right:10px;bottom:calc(var(--map-controls-bottom) + 10px);width:calc(var(--map-control-size) + 2px);height:calc(var(--map-control-size) + 2px);padding:0;display:grid;place-items:center;border-radius:4px}
-.tracker .tracker-settings{position:absolute;z-index:4;right:calc(var(--map-control-size) + 20px);bottom:calc(var(--map-controls-bottom) + 10px);width:210px;max-height:calc(100% - 24px);overflow-y:auto;padding:12px}
+.tracker .tracker-settings{position:absolute;z-index:4;right:calc(var(--map-control-size) + 20px);bottom:calc(var(--map-controls-bottom) + 10px);width:254px;max-width:calc(100% - var(--map-control-size) - 30px);max-height:calc(100% - var(--map-controls-bottom) - 24px);overflow-y:auto;padding:12px}
 .tracker-settings label{display:block;margin-top:8px;color:var(--label);font-size:12px}
 .tracker-settings output{float:right}
 .tracker-settings input[type=range]{display:block;width:100%;accent-color:var(--teal)}
 .tracker-settings select{display:block;width:100%;margin-top:4px;padding:5px 7px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink);font:12px/1.5 system-ui,sans-serif}
 .tracker-settings .display-note{margin:6px 0 0;color:var(--label);font:11px/1.4 system-ui,sans-serif}
-.tracker-settings .mgrs-toggle-row,.tracker-settings .flooding-toggle-row,.tracker-settings .obt-toggle-row{display:flex;align-items:center;gap:7px;padding-top:8px;margin-top:10px;border-top:1px solid var(--line)}
-.tracker-settings .mgrs-toggle,.tracker-settings .flooding-toggle,.tracker-settings .obt-toggle{appearance:auto;flex:0 0 auto;width:16px;height:16px;margin:0;accent-color:#2254d1}
+.tracker-settings .display-group{min-width:0;border:0;border-top:1px solid var(--line);margin:10px 0 0;padding:0}
+.tracker-settings .display-group legend{padding:0 6px 0 0;color:var(--ink);font-size:12px;font-weight:600}
+.tracker-settings .display-check{display:flex;align-items:center;gap:7px;min-height:29px;margin:0}
+.tracker-settings .display-check input{appearance:auto;flex:0 0 auto;width:16px;height:16px;margin:0;accent-color:#2254d1}
+.tracker-settings .display-suboptions{margin:0 0 5px 23px}
+.tracker-settings .display-suboptions label{margin-top:0}
+@media(pointer:coarse){.tracker-settings .display-check{min-height:44px}.tracker-settings select{min-height:44px;font-size:16px}}
 .tracker .flooding-legend{width:170px;padding:8px 11px;font-size:11px}
 .tracker .flooding-ramp{height:8px;margin-top:5px;border-radius:2px;background:linear-gradient(to right,rgba(34,84,209,0),rgba(34,84,209,.75))}
 .tracker .flooding-ramp-labels{display:flex;justify-content:space-between;color:var(--label);font-size:10px;margin-top:2px}

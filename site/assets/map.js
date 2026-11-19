@@ -55,6 +55,10 @@ export function mountMap(element,props,auth,submit,accountError) {
   let modelArchiveId=archiveId;
   const obtToggle=root.querySelector('.obt-toggle');
   const obtOptions=root.querySelector('.obt-options');
+  const thesisToggle=root.querySelector('.thesis-toggle');
+  function activeArchiveId() {
+    return thesisToggle.checked&&archiveId.startsWith('change-')?'thesis-'+archiveId:archiveId;
+  }
   const osmToggle=root.querySelector('.osm-toggle');
   const satelliteToggle=root.querySelector('.satellite-toggle');
   const waybackRelease=root.querySelector('.wayback-release');
@@ -269,7 +273,7 @@ export function mountMap(element,props,auth,submit,accountError) {
     }
     for(const period of Object.keys(props.preprocessed_maps||{})) {
       for(const id of ['preprocessed-map-'+period,'preprocessed-overview-'+period])if(map.getLayer(id)) {
-        map.setLayoutProperty(id,'visibility',!live&&period===archiveId?'visible':'none');
+        map.setLayoutProperty(id,'visibility',!live&&period===activeArchiveId()?'visible':'none');
         map.setPaintProperty(id,'raster-opacity',predictionOpacity/100);
       }
     }
@@ -354,11 +358,12 @@ export function mountMap(element,props,auth,submit,accountError) {
     map.getSource('completed')?.setData(empty);
   }
   function installArchiveLayer() {
-    const spec=props.preprocessed_maps?.[archiveId];
+    const activeId=activeArchiveId();
+    const spec=props.preprocessed_maps?.[activeId];
     // Layer presence marks style readiness. isStyleLoaded() also waits for tile
     // requests, so using it here can silently drop a period switch mid-load.
     if(!spec||!map.getLayer('selection-line'))return;
-    const tiles='preprocessed-map-'+archiveId, overview='preprocessed-overview-'+archiveId;
+    const tiles='preprocessed-map-'+activeId, overview='preprocessed-overview-'+activeId;
     // Install each period on its first visit. Keep its source and loaded tiles
     // when switching away; setDisplay selects the visible period.
     if(map.getSource(tiles))return;
@@ -885,6 +890,9 @@ export function mountMap(element,props,auth,submit,accountError) {
     if(!obtToggle.checked&&archiveId.startsWith('obt-'))archiveId=modelArchiveId;
     root.querySelectorAll('[data-archive]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.archive===archiveId)));
     announce();installArchiveLayer();setDisplay();
+  });
+  thesisToggle.addEventListener('change',()=>{
+    installArchiveLayer();setDisplay();
   });
   const about=root.querySelector('.about-overlay'),aboutLink=root.querySelector('.about-link'),aboutClose=root.querySelector('.about-close');
   const aboutSiblings=[...root.children].filter(child=>child!==about);

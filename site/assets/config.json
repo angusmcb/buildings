@@ -42,11 +42,21 @@
       "maxzoom": 17
     },
     "change-2016-2019": {
-      "url": "https://tiles.angusmcb.com/change_visualisation/v2-hrnet185000/2016-2019/south-sudan-2016-2019.pmtiles",
+      "url": "https://tiles.angusmcb.com/change_visualisation/v3-hrnet225000/2016-2019/south-sudan-2016-2019.pmtiles",
       "minzoom": 0,
       "maxzoom": 17
     },
     "change-2019-2026": {
+      "url": "https://tiles.angusmcb.com/change_visualisation/v3-hrnet225000/2019-2026/south-sudan-2019-2026.pmtiles",
+      "minzoom": 0,
+      "maxzoom": 17
+    },
+    "thesis-change-2016-2019": {
+      "url": "https://tiles.angusmcb.com/change_visualisation/v2-hrnet185000/2016-2019/south-sudan-2016-2019.pmtiles",
+      "minzoom": 0,
+      "maxzoom": 17
+    },
+    "thesis-change-2019-2026": {
       "url": "https://tiles.angusmcb.com/change_visualisation/v2-hrnet185000/2019-2026/south-sudan-2019-2026.pmtiles",
       "minzoom": 0,
       "maxzoom": 17

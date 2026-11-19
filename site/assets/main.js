@@ -19,7 +19,7 @@ async function start() {
     accountError = error.message;
   }
   mountMap(document.body, config,
-    account, createSpaceClient(config.space, account.getToken), accountError);
+    account, createSpaceClient(config.space, account.getToken, account.clear), accountError);
 }
 
 start().catch(error => {

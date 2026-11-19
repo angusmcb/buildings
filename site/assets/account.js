@@ -13,11 +13,22 @@ export function createAccount(clientId, redirectUri) {
   let token = null;
   let expiresAt = 0;
   let username = null;
+  const sessionKey = 'settlement-tracker-session:' + clientId;
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(sessionKey) || 'null');
+    if (typeof saved?.token === 'string' && typeof saved.username === 'string' &&
+        Number.isFinite(saved.expiresAt) && saved.expiresAt > Date.now()) {
+      ({token, expiresAt, username} = saved);
+    } else {
+      sessionStorage.removeItem(sessionKey);
+    }
+  } catch { /* Sign-in still works when browser storage is unavailable. */ }
 
   function clear() {
     token = null;
     expiresAt = 0;
     username = null;
+    try { sessionStorage.removeItem(sessionKey); } catch {}
   }
 
   async function signIn(returnUrl) {
@@ -61,6 +72,7 @@ export function createAccount(clientId, redirectUri) {
     token = accessToken;
     expiresAt = Date.now() + Number(expiresIn || 3600) * 1000;
     username = handle;
+    try { sessionStorage.setItem(sessionKey, JSON.stringify({token, expiresAt, username})); } catch {}
   }
 
   function getToken() {
@@ -68,8 +80,31 @@ export function createAccount(clientId, redirectUri) {
     return token;
   }
 
+  async function validate() {
+    const wasSignedIn = Boolean(token);
+    const accessToken = getToken();
+    if (!accessToken) {
+      if (wasSignedIn) throw new Error('Your Hugging Face session expired. Please log in again.');
+      return;
+    }
+    const response = await fetch(hub + '/oauth/userinfo', {
+      headers: {Authorization: 'Bearer ' + accessToken},
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (response.status === 401 || response.status === 403) {
+      clear();
+      throw new Error('Your Hugging Face session expired. Please log in again.');
+    }
+    if (!response.ok) throw new Error('Could not check your Hugging Face session. Please try again.');
+    const profile = await response.json();
+    if (profile.preferred_username !== username) {
+      clear();
+      throw new Error('Your Hugging Face account changed. Please log in again.');
+    }
+  }
+
   return {
-    signIn, completeSignIn, clear, getToken,
+    signIn, completeSignIn, clear, getToken, validate,
     get username() { return getToken() ? username : null; }
   };
 }

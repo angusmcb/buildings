@@ -1,4 +1,4 @@
-export function createSpaceClient(base, getToken) {
+export function createSpaceClient(base, getToken, clearAccount = () => {}) {
   const url = new URL(base);
   async function request(path, options = {}) {
     const token = getToken();
@@ -6,6 +6,10 @@ export function createSpaceClient(base, getToken) {
     if (token) headers.set('Authorization', 'Bearer ' + token);
     const response = await fetch(new URL(path, url), {...options, headers, redirect: 'error'});
     if (!response.ok) {
+      if (token && response.status === 401) {
+        clearAccount();
+        throw new Error('Your Hugging Face session was rejected. Please log in again.');
+      }
       const detail = await response.json().catch(() => null);
       const message = typeof detail?.detail === 'string' ? detail.detail : '';
       throw new Error(message || 'The inference service returned HTTP ' + response.status + '.');

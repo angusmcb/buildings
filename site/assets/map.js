@@ -600,6 +600,9 @@ export function mountMap(element,props,auth,submit,accountError) {
     accountAction.hidden=false;
   }
   account.addEventListener('toggle',()=>{if(account.open) refreshAccount();});
+  window.addEventListener('focus',()=>refreshAccount());
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshAccount();});
+  setInterval(()=>refreshAccount(),30_000);
   accountAction.addEventListener('click',async event=>{
     event.preventDefault();
     if (busy) return;
@@ -676,8 +679,11 @@ export function mountMap(element,props,auth,submit,accountError) {
     const comparisonRequest=custom?{comparison_target_day:comparisonDay.value}:{comparison_years:Number(comparisonYears.value)};
     const request={longitude,latitude,target_day:day.value,...comparisonRequest,area_metres:areaMetres,run_id:activeRunId};
     try {
+      await auth.validate();
+      refreshAccount();
       await submit(request,renderResponse,setProgress);
     } catch (error) {
+      refreshAccount(error.message);
       renderResponse({state:'error',run_id:request.run_id,message:error.message || 'The run failed. Please try again.'});
     }
   });

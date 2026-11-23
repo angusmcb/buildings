@@ -17,10 +17,8 @@
   <header class="tracker-header tracker-panel">
     <h1>South Sudan Settlement Tracker</h1>
     <div class="archive-legend" aria-label="Building change key">
-      <div class="archive-legend-title">Building change</div>
-      <div class="archive-legend-ramp" role="img" aria-label="Building loss in rust, through no clear change, to building gain in teal"></div>
-      <div class="archive-legend-labels"><span>Lost</span><span>No clear change</span><span>Gained</span></div>
-      <div class="archive-legend-unchanged"><span class="legend-swatch context" aria-hidden="true"></span>Unchanged buildings<span class="zoom-level" aria-label="Map zoom level"></span></div>
+      <div class="archive-legend-ramp" role="img" aria-label="Buildings no longer detected in rust, no change in grey, and new buildings detected in teal"></div>
+      <div class="archive-legend-labels"><span>Buildings no longer detected</span><span>No change</span><span>New buildings Detected</span></div>
     </div>
     <div class="mode-bar">
       <div class="map-modes" role="tablist" aria-label="Map mode">
@@ -70,7 +68,7 @@
       <div class="flooding-ramp-labels"><span>0</span><span>90+ days</span></div>
     </div>
     <div class="tracker-legend tracker-panel" hidden>
-      <div class="legend-heading"><div class="legend-items"></div><span class="zoom-level" aria-label="Map zoom level"></span></div>
+      <div class="legend-heading"><div class="legend-items"></div></div>
       <details class="result-details">
         <summary>Comparison imagery &amp; details</summary>
         <div class="result-details-body">
@@ -93,7 +91,7 @@
     </svg>
   </button>
   <aside class="tracker-settings tracker-panel" aria-label="Display settings" hidden>
-    <strong>Display</strong>
+    <div class="display-heading"><strong>Display</strong><span class="zoom-level" aria-label="Map zoom level"></span></div>
     <div class="display-theme"><span>Theme</span><div class="theme-switch" role="group" aria-label="Colour theme"><button type="button" data-theme-option="light" aria-pressed="false">Light</button><button type="button" data-theme-option="dark" aria-pressed="false">Dark</button></div></div>
     <fieldset class="display-group">
       <legend>Map layers</legend>

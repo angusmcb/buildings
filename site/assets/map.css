@@ -156,3 +156,13 @@
 .tracker .theme-switch button{border:0;border-radius:0;padding:4px 9px;background:var(--surface);color:var(--label);font-size:12px}
 .tracker .theme-switch button[aria-pressed=true]{background:var(--teal);color:var(--surface)}
 @media(pointer:coarse){.tracker .theme-switch button{min-height:36px}}
+
+/* Introduce the pre-processed building map directly beneath its title. */
+.tracker .archive-legend{margin-top:9px;color:var(--label);font-size:10.5px}
+.tracker .archive-legend-title{font-weight:600;margin-bottom:5px}
+.tracker .archive-legend-ramp{height:12px;border:1px solid var(--line);border-radius:3px;background:linear-gradient(90deg,#bc4f25 0%,var(--paper) 50%,#2e7e72 100%)}
+.tracker .archive-legend-labels{display:flex;justify-content:space-between;gap:8px;margin-top:4px}
+.tracker .archive-legend-unchanged{display:flex;align-items:center;gap:7px;margin-top:7px}
+.tracker .archive-legend-unchanged .legend-swatch{width:20px;height:10px;margin:0;border-radius:2px}
+
+.tracker .archive-legend-unchanged .zoom-level{margin-left:auto}

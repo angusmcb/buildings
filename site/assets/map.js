@@ -288,9 +288,9 @@ export function mountMap(element,props,auth,submit,accountError) {
     resizeResultHeader();
     if(resultPopup) {resultPopup.getElement().hidden=!live;if(!live)resultPopup.getElement().inert=true;}
     resultDetails.hidden=!live;
+    root.querySelector('.archive-legend').hidden=live;
     if(!live) {
-      legend.hidden=false;
-      legend.querySelector('.legend-items').innerHTML='<span class="legend-item"><span class="legend-swatch contraction"></span>Loss</span><span class="legend-item"><span class="legend-swatch growth"></span>Gain</span><span class="legend-item"><span class="legend-swatch context"></span>Buildings</span>';
+      legend.hidden=true;
       return;
     }
     legend.hidden=current?.state!=='ready';
@@ -404,9 +404,11 @@ export function mountMap(element,props,auth,submit,accountError) {
   }
   map.on('style.load',()=>{installLayers();updateFlooding();updateMgrsGrid();});
   function updateZoomIndicator() {
-    const zoom=map.getZoom().toFixed(1),indicator=legend.querySelector('.zoom-level');
-    indicator.textContent='z '+zoom;
-    indicator.setAttribute('aria-label','Map zoom level '+zoom);
+    const zoom=map.getZoom().toFixed(1);
+    for (const indicator of root.querySelectorAll('.zoom-level')) {
+      indicator.textContent='z '+zoom;
+      indicator.setAttribute('aria-label','Map zoom level '+zoom);
+    }
   }
   updateZoomIndicator();
   map.on('zoom',()=>{updateZoomIndicator();resizeResultHeader();updateChangeOverview();});

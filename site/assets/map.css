@@ -157,8 +157,8 @@
 .tracker .theme-switch button[aria-pressed=true]{background:var(--teal);color:var(--surface)}
 @media(pointer:coarse){.tracker .theme-switch button{min-height:36px}}
 
-/* Introduce the pre-processed building map directly beneath its title. */
-.tracker .archive-legend{margin-top:9px;color:var(--label);font-size:10.5px}
+/* Keep the pre-processed key with the other bottom-left map keys. */
+.tracker .archive-legend{width:330px;max-width:100%;padding:12px 16px;color:var(--label);font-size:10.5px}
 .tracker .archive-legend-ramp{height:12px;border:1px solid var(--line);border-radius:3px;background:linear-gradient(90deg,#bc4f25 0%,#918e82 50%,#2e7e72 100%)}
 .tracker .archive-legend-labels{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-top:4px}
 .tracker .archive-legend-labels span:nth-child(2){text-align:center}

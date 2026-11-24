@@ -164,3 +164,10 @@
 .tracker .archive-legend-labels span:nth-child(2){text-align:center}
 .tracker .archive-legend-labels span:last-child{text-align:right}
 .tracker .display-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+
+@media(max-width:600px){
+  .tracker-header{top:10px;left:10px;right:10px;width:auto;max-width:none;padding:8px 12px}
+  .tracker-header h1{margin-bottom:0}
+  .tracker .mode-bar{margin:2px 0 4px}
+  .tracker .map-modes button,.tracker .about-link{padding:2px 0 5px}
+}

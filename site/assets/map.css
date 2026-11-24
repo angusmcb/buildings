@@ -139,7 +139,7 @@
 .tracker .comparison-row input:disabled{opacity:.5}
 .tracker .tracker-map-key{bottom:12px}
 .tracker .about-overlay{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px;background:#0003;overflow:auto}
-.tracker .about-dialog{width:420px;max-width:100%;max-height:100%;overflow:auto;padding:18px 20px;color:var(--ink)}
+.tracker .about-dialog{width:680px;max-width:100%;max-height:100%;overflow:auto;padding:18px 20px;color:var(--ink)}
 .tracker .about-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:13px}
 .tracker .about-heading h2{margin:0;font-size:18px;font-weight:500}
 .tracker .about-close{display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;min-height:32px;padding:0;border:0;border-radius:5px;background:transparent;color:var(--label);box-shadow:none;line-height:1}
